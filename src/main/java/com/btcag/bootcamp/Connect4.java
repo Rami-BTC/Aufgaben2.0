@@ -3,6 +3,10 @@ package com.btcag.bootcamp;
 import java.util.Objects;
 import java.util.Scanner;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+// Warum die ganzen Kommentare? : Damit ich das Programm notfalls erklären kann, ohne Vorbereitung :)   ||
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+
 public class Connect4 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -14,6 +18,8 @@ public class Connect4 {
         String player2 = userLogin(sc, 2);
         String[][] player2Slots = new String[6][7];
 
+        //Ja, ich hätte auch nur ein Array machen können, aber das Leben ist nun mal schwierig :'(
+
         gameLoop(playArea, player1Slots, player2Slots, player1, player2, sc);
     }
 
@@ -21,7 +27,6 @@ public class Connect4 {
         System.out.println("Spieler "+ num +": Bitte gebe einen Namen ein: ");
 
         String username;
-
         do {
             username = sc.next();
             if (username.length() < 3 || username.length() > 15) {
@@ -36,17 +41,23 @@ public class Connect4 {
         for (int i = 0; i < area.length; i++) {
             for (int j = 0; j < area[i].length; j++) {
                 System.out.print("[");
+
+                //------Print the Players first Char || Print an empty String-----
                 if (Objects.equals(area[i][j], player1[i][j]) && player1[i][j] != null) {
                     System.out.print(user1.charAt(0) + " ");
+
                 } else if (Objects.equals(area[i][j], player2[i][j]) && player2[i][j] != null) {
                     System.out.print(user2.charAt(0) + " ");
                 } else {
                     System.out.print("  ");
                 }
+
                 System.out.print("]");
             }
             System.out.println();
         }
+
+        //-----Print available numbers/fields------
         System.out.println("[#1][#2][#3][#4][#5][#6][#7]");
     }
 
@@ -57,9 +68,12 @@ public class Connect4 {
         do {
             int num = sc.nextInt();
 
+            //-----Make sure, the player isn't out of bounce----
             if (num <= 7 && num >= 1) {
                 num -= 1;
                 for (int i = playArea.length - 1; i >= 0; i--) {
+
+                    //-----Update 'Overall Field Status' && 'Player Slots Status'
                     if (playArea[i][num] == null) {
                         playArea[i][num] = "X";
                         playerSlots[i][num] = "X";
@@ -79,15 +93,20 @@ public class Connect4 {
             createField(playArea, player1Slots, player2Slots, player1, player2);
             if (round % 2 == 0) {
                 playerTurn(sc, player2Slots, player2, playArea);
+
+                //Check if game is over
                 gameOver = checkForWin(player2Slots);
 
             } else {
                 playerTurn(sc, player1Slots, player1, playArea);
+
+                //Check if game is over
                 gameOver = checkForWin(player1Slots);
             }
             round++;
         }
 
+        //----Print Final Field && Print Winner
         createField(playArea, player1Slots, player2Slots, player1, player2);
         if (round % 2 == 0) {
             System.out.println(player1 + " hat gewonnen!");
@@ -104,6 +123,7 @@ public class Connect4 {
     private static boolean checkHorizontal(String[][] playerSlots) {
         int neighbours = 0;
 
+        //----For each neighbouring disk: neighbours++----
         for (int j = playerSlots.length-1; j > -1; j--){
             for (int i = playerSlots.length-1; i > -1; i--) {
                 if (playerSlots[i][j] != null){
@@ -124,6 +144,7 @@ public class Connect4 {
     private static boolean checkVertical(String[][] playerSlots) {
         int neighbours = 0;
 
+        //----For each neighbouring disk: neighbours++----
         for (int j = playerSlots.length-1; j > -1; j--){
             for (int i = playerSlots.length-1; i > -1; i--) {
                 if (playerSlots[j][i] != null){
