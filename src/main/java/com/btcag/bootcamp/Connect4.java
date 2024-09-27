@@ -1,6 +1,5 @@
 package com.btcag.bootcamp;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -9,58 +8,28 @@ public class Connect4 {
         Scanner sc = new Scanner(System.in);
         String[][] playArea = new String[6][7];
 
-        System.out.println("Spieler 1: Bitte gebe einen Namen ein: ");
-        String player1 = userLogin(sc);
+        String player1 = userLogin(sc, 1);
         String[][] player1Slots = new String[6][7];
 
-
-        System.out.println("\nSpieler 2: Bitte gebe einen Namen ein: ");
-        String player2 = userLogin(sc);
+        String player2 = userLogin(sc, 2);
         String[][] player2Slots = new String[6][7];
 
         gameLoop(playArea, player1Slots, player2Slots, player1, player2, sc);
     }
 
-    private static void gameLoop(String[][] playArea, String[][] player1Slots, String[][] player2Slots, String player1, String player2, Scanner sc) {
-        int round = 1;
+    public static String userLogin(Scanner sc, int num) {
+        System.out.println("Spieler "+ num +": Bitte gebe einen Namen ein: ");
 
-        boolean gameOver = false;
-        while (!gameOver) {
-            if (round % 2 == 0) {
-                createField(playArea, player1Slots, player2Slots, player1, player2);
-                turn(sc, player2Slots, player2, playArea);
-                gameOver = checkForWin(player2Slots, player2);
+        String username;
 
-            } else {
-                createField(playArea, player1Slots, player2Slots, player1, player2);
-                turn(sc, player1Slots, player1, playArea);
-                gameOver = checkForWin(player1Slots, player1);
-            }
-            round++;
-        }
-
-        createField(playArea, player1Slots, player2Slots, player1, player2);
-    }
-
-    public static void turn(Scanner sc, String[][] playerSlots, String playerName, String[][] playArea) {
-        System.out.println(playerName + " ist dran!");
-
-        boolean turnOver = false;
         do {
-            int num = sc.nextInt();
-
-            if (num <= 7 && num >= 1) {
-                num -= 1;
-                for (int i = playArea.length - 1; i >= 0; i--) {
-                    if (playArea[i][num] == null) {
-                        playArea[i][num] = "X";
-                        playerSlots[i][num] = "X";
-                        turnOver = true;
-                        break;
-                    }
-                }
+            username = sc.next();
+            if (username.length() < 3 || username.length() > 15) {
+                System.out.println("Der Name darf nur min. 3 und max. 15 Zeichen lang sein!");
             }
-        } while (!turnOver);
+        } while (username.length() < 3 || username.length() > 15);
+
+        return username;
     }
 
     public static void createField(String[][] area, String[][] player1, String[][] player2, String user1, String user2) {
@@ -81,30 +50,60 @@ public class Connect4 {
         System.out.println("[#1][#2][#3][#4][#5][#6][#7]");
     }
 
-    public static String userLogin(Scanner sc) {
-        String username = "";
+    public static void playerTurn(Scanner sc, String[][] playerSlots, String playerName, String[][] playArea) {
+        System.out.println(playerName + " ist dran!");
 
+        boolean turnOver = false;
         do {
-            username = sc.next();
+            int num = sc.nextInt();
 
-            if (username.length() < 3 || username.length() > 15) {
-                System.out.println("Der Name darf nur min. 3 und max. 15 Zeichen lang sein!");
+            if (num <= 7 && num >= 1) {
+                num -= 1;
+                for (int i = playArea.length - 1; i >= 0; i--) {
+                    if (playArea[i][num] == null) {
+                        playArea[i][num] = "X";
+                        playerSlots[i][num] = "X";
+                        turnOver = true;
+                        break;
+                    }
+                }
             }
-        } while (username.length() < 3 || username.length() > 15);
-
-        return username;
+        } while (!turnOver);
     }
 
-    public static boolean checkForWin(String[][] playerSlots, String player) {
-        if (CheckHorizontal(playerSlots, player) || CheckVertical(playerSlots, player) || CheckDiagonal(playerSlots, player)){
-            System.out.println(player + " hat gewonnen!");
-            return true;
+    private static void gameLoop(String[][] playArea, String[][] player1Slots, String[][] player2Slots, String player1, String player2, Scanner sc) {
+        int round = 1;
+
+        boolean gameOver = false;
+        while (!gameOver) {
+            createField(playArea, player1Slots, player2Slots, player1, player2);
+            if (round % 2 == 0) {
+                playerTurn(sc, player2Slots, player2, playArea);
+                gameOver = checkForWin(player2Slots);
+
+            } else {
+                playerTurn(sc, player1Slots, player1, playArea);
+                gameOver = checkForWin(player1Slots);
+            }
+            round++;
         }
-        return false;
+
+        createField(playArea, player1Slots, player2Slots, player1, player2);
+        if (round % 2 == 0) {
+            System.out.println(player1 + " hat gewonnen!");
+        } else {
+            System.out.println(player2 + " hat gewonnen!");
+
+        }
     }
 
-    private static boolean CheckHorizontal(String[][] playerSlots, String player) {
+    public static boolean checkForWin(String[][] playerSlots) {
+        return checkHorizontal(playerSlots) || checkVertical(playerSlots) || checkDiagonal(playerSlots);
+    }
+
+    private static boolean checkHorizontal(String[][] playerSlots) {
         int neighbours = 0;
+
         for (int j = playerSlots.length-1; j > -1; j--){
             for (int i = playerSlots.length-1; i > -1; i--) {
                 if (playerSlots[i][j] != null){
@@ -117,12 +116,14 @@ public class Connect4 {
                     return true;
                 }
             }
+            neighbours = 0;
         }
         return false;
     }
 
-    private static boolean CheckVertical(String[][] playerSlots, String player) {
+    private static boolean checkVertical(String[][] playerSlots) {
         int neighbours = 0;
+
         for (int j = playerSlots.length-1; j > -1; j--){
             for (int i = playerSlots.length-1; i > -1; i--) {
                 if (playerSlots[j][i] != null){
@@ -135,11 +136,12 @@ public class Connect4 {
                     return true;
                 }
             }
+            neighbours = 0;
         }
         return false;
     }
 
-    private static boolean CheckDiagonal(String[][] playerSlots, String player) {
+    private static boolean checkDiagonal(String[][] playerSlots) {
         for (int j = playerSlots.length - 1; j >= 3; j--) {
             for (int i = playerSlots[j].length - 1; i >= 3; i--) {
                 if (playerSlots[j][i] != null &&
@@ -162,5 +164,4 @@ public class Connect4 {
         }
         return false;
     }
-
 }
